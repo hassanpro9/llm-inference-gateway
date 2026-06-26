@@ -9,7 +9,7 @@ from app.models.schemas import ChatRequest, ChatResponse, Choice, MessageRespons
 
 logger = logging.getLogger(__name__)
 
-GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
+GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1/models"
 
 
 class GeminiError(Exception):

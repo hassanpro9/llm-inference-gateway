@@ -12,7 +12,7 @@ class Message(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    model: str = "gemini-1.5-flash"
+    model: str = "gemini-2.5-flash"
     messages: list[Message] = Field(..., min_length=1)
     max_tokens: int = Field(default=1024, ge=1, le=8192)
 

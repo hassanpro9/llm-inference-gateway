@@ -13,7 +13,7 @@ from app.models.schemas import ChatResponse, Choice, MessageResponse, Usage
 # ---------------------------------------------------------------------------
 
 MOCK_RESPONSE = ChatResponse(
-    model="gemini-1.5-flash",
+    model="gemini-2.5-flash",
     choices=[
         Choice(
             message=MessageResponse(content="Kubernetes orchestrates containers."),
@@ -24,7 +24,7 @@ MOCK_RESPONSE = ChatResponse(
 )
 
 VALID_PAYLOAD = {
-    "model": "gemini-1.5-flash",
+    "model": "gemini-2.5-flash",
     "messages": [{"role": "user", "content": "What is Kubernetes?"}],
     "max_tokens": 256,
 }
@@ -45,7 +45,7 @@ def test_chat_success(client: TestClient) -> None:
 
     assert resp.status_code == 200
     data = resp.json()
-    assert data["model"] == "gemini-1.5-flash"
+    assert data["model"] == "gemini-2.5-flash"
     assert len(data["choices"]) == 1
     assert data["choices"][0]["message"]["role"] == "assistant"
     assert "content" in data["choices"][0]["message"]
@@ -53,7 +53,7 @@ def test_chat_success(client: TestClient) -> None:
 
 
 def test_chat_missing_messages(client: TestClient) -> None:
-    resp = client.post("/v1/chat", json={"model": "gemini-1.5-flash"})
+    resp = client.post("/v1/chat", json={"model": "gemini-2.5-flash"})
     assert resp.status_code == 422
 
 

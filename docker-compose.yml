@@ -7,6 +7,11 @@ services:
       - .env
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+    # Mount app source so uvicorn --reload picks up changes without a rebuild.
+    # The volume is owned by appuser (uid 1001) inside the container.
+    volumes:
+      - ./app:/app/app
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

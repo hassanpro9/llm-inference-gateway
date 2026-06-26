@@ -30,7 +30,7 @@ export default function () {
   const prompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
 
   const payload = JSON.stringify({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     messages: [{ role: 'user', content: prompt }],
     max_tokens: 128,
   });

@@ -59,19 +59,60 @@ CI/CD (GitHub Actions):
 
 ## Quickstart
 
-See **[KIND_CLUSTER.md](KIND_CLUSTER.md)** for the full step-by-step local deployment guide.
+See **[KIND_CLUSTER.md](KIND_CLUSTER.md)** for the full Kubernetes deployment guide.
 
-**TL;DR:**
+### Local dev (docker compose)
 
 ```bash
 git clone https://github.com/hassanpro9/llm-inference-gateway
 cd llm-inference-gateway
 cp .env.example .env          # add your GEMINI_API_KEY
-
-docker compose up             # local dev: API + Prometheus + Grafana
-# OR
-# see KIND_CLUSTER.md for the full Kubernetes deployment
+docker compose up
 ```
+
+The API, Prometheus, and Grafana all start together. Once the containers are up, verify everything is working:
+
+**1. Check containers are running**
+```bash
+docker compose ps
+# Should show: api, prometheus, grafana — all running
+```
+
+**2. Liveness probe**
+```bash
+curl http://localhost:8000/health
+# {"status":"ok"}
+```
+
+**3. Readiness probe (confirms your API key is configured)**
+```bash
+curl http://localhost:8000/ready
+# {"status":"ok","gemini_key_configured":true}
+# Returns 503 if GEMINI_API_KEY is missing from .env
+```
+
+**4. Send a real chat request**
+```bash
+curl -X POST http://localhost:8000/v1/chat \
+  -H "Content-Type: application/json" \
+  -d '{"messages": [{"role": "user", "content": "What is Kubernetes in one sentence?"}]}'
+```
+
+**5. Check Prometheus is scraping**
+
+Open http://localhost:9090 → **Status → Targets** — the `llm-gateway` job should show as UP.
+
+**6. Check raw metrics**
+```bash
+curl http://localhost:8000/metrics
+# Returns Prometheus text with llm_requests_total, llm_request_duration_seconds, etc.
+```
+
+**7. Grafana**
+
+Open http://localhost:3000 — login `admin` / `admin`. Import `monitoring/grafana-dashboard.json` to get the full dashboard (+ → Import → upload file → select Prometheus datasource).
+
+> Hot reload is enabled in docker compose — any change to `app/` is picked up instantly without restarting containers.
 
 ---
 
@@ -85,7 +126,7 @@ Request a completion from Gemini. Uses an OpenAI-compatible schema.
 
 ```json
 {
-  "model": "gemini-1.5-flash",
+  "model": "gemini-2.5-flash",
   "messages": [
     { "role": "user", "content": "Explain Kubernetes in one sentence." }
   ],
@@ -99,7 +140,7 @@ Request a completion from Gemini. Uses an OpenAI-compatible schema.
 {
   "id": "a3f1c2d4-...",
   "object": "chat.completion",
-  "model": "gemini-1.5-flash",
+  "model": "gemini-2.5-flash",
   "choices": [
     {
       "index": 0,
