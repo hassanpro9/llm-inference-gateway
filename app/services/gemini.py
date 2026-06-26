@@ -50,6 +50,10 @@ async def call_gemini(request: ChatRequest) -> ChatResponse:
             params={"key": api_key},
         )
 
+    if resp.status_code == 429:
+        logger.warning("Gemini API rate limit hit (429)")
+        raise GeminiError("Gemini rate limit exceeded — free tier is 15 RPM. Retry after a moment.")
+
     if resp.status_code != 200:
         logger.error("Gemini API error status=%d body=%s", resp.status_code, resp.text)
         raise GeminiError(f"Gemini API returned {resp.status_code}: {resp.text}")

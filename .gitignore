@@ -23,8 +23,9 @@ venv/
 *.swp
 *.swo
 
-# macOS
-.DS_Store
+# Logs
+*.log
+*.log.*
 
 # Grafana data (docker-compose volume is managed by Docker)
 grafana-data/

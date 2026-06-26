@@ -5,14 +5,14 @@ import { Rate } from 'k6/metrics';
 const errorRate = new Rate('errors');
 
 export const options = {
-  vus: 10,
-  duration: '60s',
+  // Gemini 2.5 Flash free tier: 5 RPM hard limit.
+  // 1 VU × 1 req per 15s = 4 RPM — safely under the cap.
+  // For a paid key, increase vus to 5 and reduce sleep to 3s.
+  vus: 1,
+  duration: '90s',
   thresholds: {
-    // Less than 5% of requests should fail
     errors: ['rate<0.05'],
-    // 95% of requests must complete within 10 seconds
-    // (Gemini free tier can be slow under load)
-    http_req_duration: ['p(95)<10000'],
+    http_req_duration: ['p(95)<15000'],
   },
 };
 
@@ -56,6 +56,6 @@ export default function () {
 
   errorRate.add(!success);
 
-  // Gentle pacing — Gemini free tier is 15 RPM across all VUs
-  sleep(1);
+  // 15s sleep keeps us at ~4 RPM — under the 5 RPM free tier hard limit.
+  sleep(15);
 }

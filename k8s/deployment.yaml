@@ -35,6 +35,8 @@ spec:
       containers:
         - name: llm-gateway
           image: ghcr.io/hassanpro9/llm-inference-gateway:latest
+          # imagePullPolicy is Always for production (GHCR).
+          # For local kind deployment, this is patched to Never via kubectl — see KIND_CLUSTER.md
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

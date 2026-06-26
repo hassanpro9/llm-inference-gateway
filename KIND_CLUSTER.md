@@ -55,6 +55,8 @@ kind load docker-image llm-inference-gateway:local --name llm-gateway
 
 This loads the image directly into the kind cluster so Kubernetes can pull it without a registry.
 
+> If you already ran `docker compose up`, the build will be instant — all layers are cached. The compose build uses a different tag, so you still need to run this command to get the `llm-inference-gateway:local` tag that the Kubernetes manifest expects.
+
 ---
 
 ## Step 4 — Deploy the application
@@ -69,10 +71,16 @@ kubectl create secret generic llm-gateway-secrets \
   --from-literal=GEMINI_API_KEY=$(grep GEMINI_API_KEY .env | cut -d= -f2) \
   -n llm-gateway
 
-# Update the image name to the locally loaded image
-# (Edit k8s/deployment.yaml: change the image to llm-inference-gateway:local)
-# Then apply the rest of the manifests
+# Apply the deployment, then immediately patch it for local use:
+# 1. Switch to the locally loaded image
+# 2. Set imagePullPolicy to Never (prevents Kubernetes trying to pull from GHCR)
 kubectl apply -f k8s/deployment.yaml
+kubectl set image deployment/llm-gateway \
+  llm-gateway=llm-inference-gateway:local \
+  -n llm-gateway
+kubectl patch deployment llm-gateway -n llm-gateway \
+  -p '{"spec":{"template":{"spec":{"containers":[{"name":"llm-gateway","imagePullPolicy":"Never"}]}}}}'
+
 kubectl apply -f k8s/service.yaml
 kubectl apply -f k8s/ingress.yaml
 kubectl apply -f k8s/hpa.yaml
