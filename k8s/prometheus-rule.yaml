@@ -1,0 +1,38 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: llm-gateway-alerts
+  namespace: llm-gateway
+  labels:
+    # This label is required for the kube-prometheus-stack to pick up the rule.
+    release: monitoring
+spec:
+  groups:
+    - name: llm-gateway
+      rules:
+        - alert: HighErrorRate
+          expr: rate(llm_requests_total{status_code=~"5.."}[2m]) > 0.05
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate on llm-gateway"
+            description: "Error rate has been above 5% for more than 2 minutes."
+
+        - alert: HighLatency
+          expr: histogram_quantile(0.95, rate(llm_request_duration_seconds_bucket[5m])) > 2
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High P95 latency on llm-gateway"
+            description: "P95 latency has been above 2 seconds for 5 minutes."
+
+        - alert: PodRestartLoop
+          expr: rate(kube_pod_container_status_restarts_total{namespace="llm-gateway"}[10m]) > 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod restart loop detected"
+            description: "A pod in the llm-gateway namespace has been restarting for 10+ minutes."

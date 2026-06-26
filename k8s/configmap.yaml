@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-gateway-config
+  namespace: llm-gateway
+data:
+  DEFAULT_MODEL: "gemini-1.5-flash"
+  MAX_TOKENS: "1024"
+  LOG_LEVEL: "info"

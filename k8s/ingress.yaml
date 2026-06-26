@@ -1,0 +1,26 @@
+# For a local kind cluster, use kubectl port-forward instead of this ingress:
+#
+#   kubectl port-forward svc/llm-gateway 8080:80 -n llm-gateway
+#
+# This manifest is included to demonstrate how ingress would work in a real cluster
+# with nginx-ingress-controller installed.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-gateway
+  namespace: llm-gateway
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: llm-gateway.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llm-gateway
+                port:
+                  number: 80

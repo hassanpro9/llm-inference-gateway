@@ -1,0 +1,34 @@
+grafana:
+  adminPassword: admin
+  service:
+    type: NodePort    # accessible on the kind cluster without a real ingress
+  sidecar:
+    dashboards:
+      enabled: true
+
+prometheus:
+  prometheusSpec:
+    # Allow scraping pods/services not created by this Helm release
+    podMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    # Scrape pods with prometheus.io/scrape: "true" annotations
+    additionalScrapeConfigs:
+      - job_name: "llm-gateway-pods"
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - llm-gateway
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: "true"
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__

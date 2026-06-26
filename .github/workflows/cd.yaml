@@ -1,0 +1,41 @@
+# This workflow deploys to a real Kubernetes cluster (GKE, EKS, AKS, etc.).
+#
+# For local kind deployment, see KIND_CLUSTER.md instead.
+#
+# To enable this workflow:
+#   1. Encode your kubeconfig: base64 -w0 ~/.kube/config
+#   2. Add the result as a GitHub Actions secret named KUBE_CONFIG
+#   3. Update the image name in deployment.yaml to match your GHCR path
+#
+# This file is intentionally left in a documented but non-running state.
+# It demonstrates the full CD pipeline shape without requiring live infrastructure.
+
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Deploy new image
+        run: |
+          kubectl set image deployment/llm-gateway \
+            llm-gateway=ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            -n llm-gateway
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/llm-gateway -n llm-gateway --timeout=120s
