@@ -13,14 +13,18 @@
 name: CD
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
+  # Triggered manually when deploying to a real cluster.
+  # For local kind deployment, see KIND_CLUSTER.md instead.
+  # To use: Actions → CD → Run workflow
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to deploy (defaults to latest)"
+        required: false
+        default: "latest"
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +38,7 @@ jobs:
       - name: Deploy new image
         run: |
           kubectl set image deployment/llm-gateway \
-            llm-gateway=ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            llm-gateway=ghcr.io/${{ github.repository }}:${{ inputs.image_tag || github.sha }} \
             -n llm-gateway
 
       - name: Wait for rollout
