@@ -34,7 +34,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: llm-gateway
-          image: ghcr.io/YOUR_GITHUB_USERNAME/llm-inference-gateway:latest
+          image: ghcr.io/hassanpro9/llm-inference-gateway:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

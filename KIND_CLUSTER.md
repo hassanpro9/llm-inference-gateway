@@ -37,7 +37,7 @@ kubectl cluster-info --context kind-llm-gateway
 ## Step 2 — Clone and configure
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/llm-inference-gateway
+git clone https://github.com/hassanpro9/llm-inference-gateway
 cd llm-inference-gateway
 
 cp .env.example .env

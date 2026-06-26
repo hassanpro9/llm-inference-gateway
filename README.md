@@ -2,7 +2,7 @@
 
 A cloud-native LLM inference API backed by Google Gemini. Runs on Kubernetes with full observability, CI/CD, and autoscaling — reproducible locally with `kind` in under 10 minutes.
 
-![CI](https://github.com/YOUR_GITHUB_USERNAME/llm-inference-gateway/actions/workflows/ci.yaml/badge.svg)
+![CI](https://github.com/hassanpro9/llm-inference-gateway/actions/workflows/ci.yaml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.12-blue.svg)
 
@@ -64,7 +64,7 @@ See **[KIND_CLUSTER.md](KIND_CLUSTER.md)** for the full step-by-step local deplo
 **TL;DR:**
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/llm-inference-gateway
+git clone https://github.com/hassanpro9/llm-inference-gateway
 cd llm-inference-gateway
 cp .env.example .env          # add your GEMINI_API_KEY
 
@@ -173,7 +173,7 @@ Every push triggers:
 
 1. **Lint** — `ruff check app/ tests/`
 2. **Test** — `pytest tests/ -v`
-3. **Build & push** — Docker image pushed to `ghcr.io/YOUR_GITHUB_USERNAME/llm-inference-gateway` on merge to `main`
+3. **Build & push** — Docker image pushed to `ghcr.io/hassanpro9/llm-inference-gateway` on merge to `main`
 
 See `.github/workflows/ci.yaml` and `cd.yaml`.
 
